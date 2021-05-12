@@ -111,7 +111,13 @@ class Students(Resource):
         return student, 201
 
 
-
+class Classe(Resource):
+    @marshal_with(classes_fields)
+    def get(self,code):
+        result = ClassesModel.query.filter_by(code=code).first()
+        if not result:
+            abort(404, message="No class were found")
+        return result
 
 class Classes(Resource):
     @marshal_with(classes_fields)
@@ -136,6 +142,7 @@ class Classes(Resource):
 api.add_resource(Students, '/students')    # add endpoints
 api.add_resource(Student, '/students/<int:studentID>')
 api.add_resource(Classes, '/classes')
+api.add_resource(Classe, '/classes/<int:code>')
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
