@@ -86,10 +86,6 @@ class Students(Resource):
         parser.add_argument('last_name', type = str, required=True)
         parser.add_argument('first_name', type = str, required=True)
         args = parser.parse_args()  #parse arguments
-        
-        result = StudentModel.query.filter(StudentModel.last_name==args['last_name']).filter(StudentModel.first_name==args['first_name']).first()
-        if result:
-            abort(409, message="Student already exists")
             
         student = StudentModel(last_name=args['last_name'], first_name=args['first_name'])
         db.session.add(student)
