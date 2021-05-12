@@ -118,6 +118,37 @@ class Classe(Resource):
         if not result:
             abort(404, message="No class were found")
         return result
+    
+    
+    @marshal_with(classes_fields)
+    def put(self, code):
+        parser = reqparse.RequestParser()  
+        parser.add_argument('title', type = str )
+        parser.add_argument('description', type = str )
+        args = parser.parse_args()  #parse arguments
+        print(args)
+        
+        result = ClassesModel.query.filter_by(code=code).first()
+        if not result:
+            abort(404, message="Class doesn't exist, cannot update")
+
+        if args['title']:
+            result.title = args['title']
+        if args['description']:
+            result.description = args['description']
+
+        db.session.commit()
+        return result
+    
+    @marshal_with(classes_fields)
+    def delete(self,code):
+        result = ClassesModel.query.filter_by(code=code).first()
+        if not result:
+            abort(404, message="Class doesn't exist, cannot delete")
+        
+        db.session.delete(result)
+        db.session.commit()
+        return {}, 204
 
 class Classes(Resource):
     @marshal_with(classes_fields)
