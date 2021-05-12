@@ -111,8 +111,31 @@ class Students(Resource):
         return student, 201
 
 
+
+
+class Classes(Resource):
+    @marshal_with(classes_fields)
+    def get(self):
+        result = ClassesModel.query.all()
+        if not result:
+            abort(404, message="No classes were found")
+        return result
+    
+    @marshal_with(classes_fields)
+    def post(self):
+        parser = reqparse.RequestParser()  
+        parser.add_argument('title', type = str, required=True)
+        parser.add_argument('description', type = str, required=True)
+        args = parser.parse_args()  #parse arguments
+
+        classs = ClassesModel(title=args['title'], description=args['description'])
+        db.session.add(classs)
+        db.session.commit()
+        return classs, 201
+
 api.add_resource(Students, '/students')    # add endpoints
 api.add_resource(Student, '/students/<int:studentID>')
+api.add_resource(Classes, '/classes')
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
