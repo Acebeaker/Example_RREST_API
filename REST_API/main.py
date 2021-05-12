@@ -20,7 +20,6 @@ class StudentModel(db.Model):
     def __repr__(self):
     	return f"{studentID}: {last_name} {first_name}"
  
-
 class ClassesModel(db.Model):
     __tablename__ = 'classes'
     code = db.Column(db.Integer, primary_key=True)
@@ -30,7 +29,6 @@ class ClassesModel(db.Model):
     def __repr__(self):
         return f"{name}: {description}"
 
-
 #db.create_all()
 
  
@@ -39,8 +37,6 @@ student_fields = {
 	'last_name': fields.String,
 	'first_name': fields.String
 }
-
-
 
 classes_fields = {
 	'code': fields.Integer,
@@ -89,7 +85,6 @@ class Student(Resource):
         db.session.commit()
         return {}, 204
         
-
 class Students(Resource):
     @marshal_with(student_fields)
     def get(self):
@@ -109,7 +104,6 @@ class Students(Resource):
         db.session.add(student)
         db.session.commit()
         return student, 201
-
 
 class Classe(Resource):
     @marshal_with(classes_fields)
