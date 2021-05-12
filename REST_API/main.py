@@ -21,6 +21,16 @@ class StudentModel(db.Model):
     	return f"{studentID}: {last_name} {first_name}"
  
 
+class ClassesModel(db.Model):
+    __tablename__ = 'classes'
+    code = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(500), nullable=False)
+
+    def __repr__(self):
+        return f"{name}: {description}"
+
+
 #db.create_all()
 
  
@@ -28,6 +38,14 @@ student_fields = {
 	'studentID': fields.Integer,
 	'last_name': fields.String,
 	'first_name': fields.String
+}
+
+
+
+classes_fields = {
+	'code': fields.Integer,
+	'title': fields.String,
+	'description': fields.String
 }
 
 
