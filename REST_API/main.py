@@ -9,6 +9,8 @@ api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
+
+
 class StudentModel(db.Model):
     __tablename__ = 'students'
     studentID = db.Column(db.Integer, primary_key=True)
@@ -19,6 +21,84 @@ class StudentModel(db.Model):
     	return f"{studentID}: {last_name} {first_name}"
  
 
+#db.create_all()
+
+ 
+student_fields = {
+	'studentID': fields.Integer,
+	'last_name': fields.String,
+	'first_name': fields.String
+}
+
+
+class Student(Resource):
+    @marshal_with(student_fields)
+    def get(self,studentID):
+        result = StudentModel.query.filter_by(studentID=studentID).first()
+        if not result:
+            abort(404, message="No students were found")
+        return result
+    
+    
+
+    @marshal_with(student_fields)
+    def put(self, studentID):
+        parser = reqparse.RequestParser()  
+        parser.add_argument('last_name', type = str )
+        parser.add_argument('first_name', type = str )
+        args = parser.parse_args()  #parse arguments
+        print(args)
+        result = StudentModel.query.filter_by(studentID=studentID).first()
+        if not result:
+            abort(404, message="Student doesn't exist, cannot update")
+
+        if args['last_name']:
+            result.last_name = args['last_name']
+        if args['first_name']:
+            result.first_name = args['first_name']
+
+        db.session.commit()
+
+        return result
+    
+    @marshal_with(student_fields)
+    def delete(self,studentID):
+        result = StudentModel.query.filter_by(studentID=studentID).first()
+        if not result:
+            abort(404, message="Student doesn't exist, cannot delete")
+        
+        db.session.delete(result)
+        db.session.commit()
+        return {}, 204
+        
+
+class Students(Resource):
+    @marshal_with(student_fields)
+    def get(self):
+        result = StudentModel.query.all()
+        if not result:
+            abort(404, message="No students were found")
+        return result
+    
+    @marshal_with(student_fields)
+    def post(self):
+        parser = reqparse.RequestParser()  
+        parser.add_argument('last_name', type = str, required=True)
+        parser.add_argument('first_name', type = str, required=True)
+        args = parser.parse_args()  #parse arguments
+        
+        result = StudentModel.query.filter(StudentModel.last_name==args['last_name']).filter(StudentModel.first_name==args['first_name']).first()
+        if result:
+            abort(409, message="Student already exists")
+            
+        student = StudentModel(last_name=args['last_name'], first_name=args['first_name'])
+        db.session.add(student)
+        db.session.commit()
+        return student, 201
+
+
+api.add_resource(Students, '/students')    # add endpoints
+api.add_resource(Student, '/students/<int:studentID>')
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
