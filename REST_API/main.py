@@ -61,6 +61,27 @@ grades_fields = {
 	'class_id': fields.Integer
 }
 
+gradesclass_fields = {
+    'items' : fields.List(fields.Nested(grades_fields))
+}
+
+
+
+class StudentLastName(Resource):
+    @marshal_with(student_fields)
+    def get(self,last_name):
+        result = StudentModel.query.filter_by(last_name=last_name).first()
+        if not result:
+            abort(404, message="No students were found")
+        return result
+    
+class StudentFirstName(Resource):
+    @marshal_with(student_fields)
+    def get(self,first_name):
+        result = StudentModel.query.filter_by(first_name=first_name).first()
+        if not result:
+            abort(404, message="No students were found")
+        return result
 
 class Student(Resource):
     @marshal_with(student_fields)
@@ -121,6 +142,22 @@ class Students(Resource):
         db.session.add(student)
         db.session.commit()
         return student, 201
+
+class ClasseTitle(Resource):
+    @marshal_with(classes_fields)
+    def get(self,title):
+        result = ClassesModel.query.filter_by(title=title).first()
+        if not result:
+            abort(404, message="No class were found")
+        return result
+    
+class ClasseDescription(Resource):
+    @marshal_with(classes_fields)
+    def get(self,description):
+        result = ClassesModel.query.filter_by(description=description).first()
+        if not result:
+            abort(404, message="No class were found")
+        return result
 
 class Classe(Resource):
     @marshal_with(classes_fields)
@@ -183,12 +220,23 @@ class Classes(Resource):
     
 
 class GradesClasses(Resource):
-    @marshal_with(grades_fields)
+    @marshal_with(student_fields) 
     def get(self, code):
-        result = GradesModel.query.filter_by(class_id=code)
-        if not result:
-            abort(404, message="No Classes were found")
-        return result
+        #results = GradesModel.query.filter(GradesModel.class_id == code).all()
+        results = StudentModel.query.filter(StudentModel.grades.any(GradesModel.class_id == code)).all()
+        if not results:
+            abort(404, message="Class not found")
+        return results
+    
+    
+class GradesStudents(Resource):
+    @marshal_with(classes_fields) 
+    def get(self, studentID):
+        #results = GradesModel.query.filter(GradesModel.class_id == code).all()
+        results = ClassesModel.query.filter(ClassesModel.grades.any(GradesModel.student_id == studentID)).all()
+        if not results:
+            abort(404, message="Class not found")
+        return results
 
     
 class Grades(Resource):
@@ -221,10 +269,17 @@ class Grades(Resource):
 
 api.add_resource(Students, '/students')    # add endpoints
 api.add_resource(Student, '/students/<int:studentID>')
+api.add_resource(StudentLastName, '/students/lastname/<string:last_name>')
+api.add_resource(StudentFirstName, '/students/firstname/<string:first_name>')
+
 api.add_resource(Classes, '/classes')
 api.add_resource(Classe, '/classes/<int:code>')
+api.add_resource(ClasseTitle, '/classes/title/<string:title>')
+api.add_resource(ClasseDescription, '/classes/description/<string:description>')
+
 api.add_resource(Grades, '/grades')
 api.add_resource(GradesClasses, '/grades/classes/<int:code>')
+api.add_resource(GradesStudents, '/grades/students/<int:studentID>')
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
