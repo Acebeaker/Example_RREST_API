@@ -1,15 +1,15 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
-import pandas as pd
-import ast
+
 
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
-
+# Declartion for database models for students, classes and grades 
+# (used as a link between the previous two)
 
 class StudentModel(db.Model):
     __tablename__ = 'students'
@@ -42,6 +42,7 @@ class GradesModel(db.Model):
 
 #db.create_all()
 
+# Fields declarations for marshal decorator
  
 student_fields = {
 	'studentID': fields.Integer,
@@ -61,12 +62,7 @@ grades_fields = {
 	'class_id': fields.Integer
 }
 
-gradesclass_fields = {
-    'items' : fields.List(fields.Nested(grades_fields))
-}
-
-
-
+# Students Classes with Rest Methods
 class StudentLastName(Resource):
     @marshal_with(student_fields)
     def get(self,last_name):
@@ -91,8 +87,6 @@ class Student(Resource):
             abort(404, message="No students were found")
         return result
     
-    
-
     @marshal_with(student_fields)
     def put(self, studentID):
         parser = reqparse.RequestParser()  
@@ -142,6 +136,8 @@ class Students(Resource):
         db.session.add(student)
         db.session.commit()
         return student, 201
+
+# Class Classes with Rest Methods
 
 class ClasseTitle(Resource):
     @marshal_with(classes_fields)
@@ -218,6 +214,7 @@ class Classes(Resource):
         db.session.commit()
         return classs, 201
     
+#Grades Classes with Rest Methods
 
 class GradesClasses(Resource):
     @marshal_with(student_fields) 
@@ -227,8 +224,7 @@ class GradesClasses(Resource):
         if not results:
             abort(404, message="Class not found")
         return results
-    
-    
+      
 class GradesStudents(Resource):
     @marshal_with(classes_fields) 
     def get(self, studentID):
@@ -237,8 +233,7 @@ class GradesStudents(Resource):
         if not results:
             abort(404, message="Class not found")
         return results
-
-    
+ 
 class Grades(Resource):
     @marshal_with(grades_fields)
     def get(self):
@@ -267,19 +262,21 @@ class Grades(Resource):
         db.session.commit()
         return grades, 201
 
-api.add_resource(Students, '/students')    # add endpoints
-api.add_resource(Student, '/students/<int:studentID>')
-api.add_resource(StudentLastName, '/students/lastname/<string:last_name>')
-api.add_resource(StudentFirstName, '/students/firstname/<string:first_name>')
+#ENDPOINTS Declaration
 
-api.add_resource(Classes, '/classes')
-api.add_resource(Classe, '/classes/<int:code>')
-api.add_resource(ClasseTitle, '/classes/title/<string:title>')
-api.add_resource(ClasseDescription, '/classes/description/<string:description>')
+api.add_resource(Students, '/students')  # Students Endpoint - Methods (GET (all), POST)
+api.add_resource(Student, '/students/<int:studentID>') # Students Endpoint - Methods (GET (single by ID), PUT, DELETE)
+api.add_resource(StudentLastName, '/students/lastname/<string:last_name>') # Students Endpoint - Methods (GET (single by Last Name))
+api.add_resource(StudentFirstName, '/students/firstname/<string:first_name>') # Students Endpoint - Methods (GET (single by First Name))
 
-api.add_resource(Grades, '/grades')
-api.add_resource(GradesClasses, '/grades/classes/<int:code>')
-api.add_resource(GradesStudents, '/grades/students/<int:studentID>')
+api.add_resource(Classes, '/classes') # Classes Endpoint - Methods (GET (all), POST)
+api.add_resource(Classe, '/classes/<int:code>') # Classes Endpoint - Methods (GET (single by ID), PUT, DELETE)
+api.add_resource(ClasseTitle, '/classes/title/<string:title>') # Classes Endpoint - Methods (GET (single by Title))
+api.add_resource(ClasseDescription, '/classes/description/<string:description>') # Classes Endpoint - Methods (GET (single by Description))
+
+api.add_resource(Grades, '/grades') # Grades Endpoint - Methods (GET (all), POST)
+api.add_resource(GradesClasses, '/grades/classes/<int:code>') # Students of a Class Endpoint - Methods (GET (single by Class' Code))
+api.add_resource(GradesStudents, '/grades/students/<int:studentID>') # Classes of a Student Endpoint - Methods (GET (single by Student's ID))
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
