@@ -66,7 +66,7 @@ grades_fields = {
 class StudentLastName(Resource):
     @marshal_with(student_fields)
     def get(self,last_name):
-        result = StudentModel.query.filter_by(last_name=last_name).first()
+        result = StudentModel.query.filter(StudentModel.last_name.startswith(last_name)).all()
         if not result:
             abort(404, message="No students were found")
         return result
@@ -74,7 +74,7 @@ class StudentLastName(Resource):
 class StudentFirstName(Resource):
     @marshal_with(student_fields)
     def get(self,first_name):
-        result = StudentModel.query.filter_by(first_name=first_name).first()
+        result = StudentModel.query.filter(StudentModel.first_name.startswith(first_name)).all()
         if not result:
             abort(404, message="No students were found")
         return result
@@ -142,7 +142,7 @@ class Students(Resource):
 class ClasseTitle(Resource):
     @marshal_with(classes_fields)
     def get(self,title):
-        result = ClassesModel.query.filter_by(title=title).first()
+        result = ClassesModel.query.filter(ClassesModel.title.startswith(title)).all()
         if not result:
             abort(404, message="No class were found")
         return result
@@ -150,7 +150,7 @@ class ClasseTitle(Resource):
 class ClasseDescription(Resource):
     @marshal_with(classes_fields)
     def get(self,description):
-        result = ClassesModel.query.filter_by(description=description).first()
+        result = ClassesModel.query.filter(ClassesModel.description.startswith(description)).all()
         if not result:
             abort(404, message="No class were found")
         return result
@@ -266,13 +266,13 @@ class Grades(Resource):
 
 api.add_resource(Students, '/students')  # Students Endpoint - Methods (GET (all), POST)
 api.add_resource(Student, '/students/<int:studentID>') # Students Endpoint - Methods (GET (single by ID), PUT, DELETE)
-api.add_resource(StudentLastName, '/students/lastname/<string:last_name>') # Students Endpoint - Methods (GET (single by Last Name))
-api.add_resource(StudentFirstName, '/students/firstname/<string:first_name>') # Students Endpoint - Methods (GET (single by First Name))
+api.add_resource(StudentLastName, '/students/lastname/<string:last_name>') # Students Endpoint - Methods (GET (looking for each LASTNAME starting with it))
+api.add_resource(StudentFirstName, '/students/firstname/<string:first_name>') # Students Endpoint - Methods (GET (looking for each FIRSTNAME starting with it))
 
 api.add_resource(Classes, '/classes') # Classes Endpoint - Methods (GET (all), POST)
 api.add_resource(Classe, '/classes/<int:code>') # Classes Endpoint - Methods (GET (single by ID), PUT, DELETE)
-api.add_resource(ClasseTitle, '/classes/title/<string:title>') # Classes Endpoint - Methods (GET (single by Title))
-api.add_resource(ClasseDescription, '/classes/description/<string:description>') # Classes Endpoint - Methods (GET (single by Description))
+api.add_resource(ClasseTitle, '/classes/title/<string:title>') # Classes Endpoint - Methods (GET (looking for each TITLE starting with it))
+api.add_resource(ClasseDescription, '/classes/description/<string:description>') # Classes Endpoint - Methods (GET (looking for each DESCRIPTION starting with it))
 
 api.add_resource(Grades, '/grades') # Grades Endpoint - Methods (GET (all), POST)
 api.add_resource(GradesClasses, '/grades/classes/<int:code>') # Students of a Class Endpoint - Methods (GET (single by Class' Code))
