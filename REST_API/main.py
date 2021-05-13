@@ -16,6 +16,7 @@ class StudentModel(db.Model):
     studentID = db.Column(db.Integer, primary_key=True)
     last_name = db.Column(db.String(50), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
+    grades = db.relationship('GradesModel', backref='studentmodel', lazy=True)
 
     def __repr__(self):
     	return f"{studentID}: {last_name} {first_name}"
@@ -25,6 +26,7 @@ class ClassesModel(db.Model):
     code = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(500), nullable=False)
+    grades = db.relationship('GradesModel', backref='classesmodel', lazy=True)
 
     def __repr__(self):
         return f"{name}: {description}"
@@ -32,11 +34,11 @@ class ClassesModel(db.Model):
 class GradesModel(db.Model):
     __tablename__ = 'grades'
     gradeID = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.studentID'), nullable = False)
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.code'), nullable = False)
 
     def __repr__(self):
-        return f"{name}: {description}"
+        return f"..."
 
 #db.create_all()
 
@@ -51,6 +53,12 @@ classes_fields = {
 	'code': fields.Integer,
 	'title': fields.String,
 	'description': fields.String
+}
+
+grades_fields = {
+	'gradeID': fields.Integer,
+	'student_id': fields.Integer,
+	'class_id': fields.Integer
 }
 
 
@@ -172,11 +180,51 @@ class Classes(Resource):
         db.session.add(classs)
         db.session.commit()
         return classs, 201
+    
+
+class GradesClasses(Resource):
+    @marshal_with(grades_fields)
+    def get(self, code):
+        result = GradesModel.query.filter_by(class_id=code)
+        if not result:
+            abort(404, message="No Classes were found")
+        return result
+
+    
+class Grades(Resource):
+    @marshal_with(grades_fields)
+    def get(self):
+        result = GradesModel.query.all()
+        if not result:
+            abort(404, message="No assignments were found")
+        return result
+    
+    @marshal_with(grades_fields)
+    def post(self):
+        parser = reqparse.RequestParser()  
+        parser.add_argument('student_id', type = str, required=True)
+        parser.add_argument('class_id', type = str, required=True)
+        args = parser.parse_args()  #parse arguments
+
+        studentResult = StudentModel.query.filter_by(studentID=args['student_id']).first()
+        if not studentResult:
+            abort(404, message="The student you are looking for does not exist")
+            
+        classResult = ClassesModel.query.filter_by(code=args['class_id']).first()
+        if not classResult:
+            abort(404, message="The class you are looking for does not exist")
+        
+        grades = GradesModel(student_id=args['student_id'], class_id=args['class_id'])
+        db.session.add(grades)
+        db.session.commit()
+        return grades, 201
 
 api.add_resource(Students, '/students')    # add endpoints
 api.add_resource(Student, '/students/<int:studentID>')
 api.add_resource(Classes, '/classes')
 api.add_resource(Classe, '/classes/<int:code>')
+api.add_resource(Grades, '/grades')
+api.add_resource(GradesClasses, '/grades/classes/<int:code>')
 
 if __name__ == '__main__':
     app.run(debug=True)  # run our Flask app
