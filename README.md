@@ -4,13 +4,13 @@
   * Students
     * '/students' : Students Endpoint - Methods: `GET` (all) | `POST`
     * '/students/<int:studentID>' : Students Endpoint - Methods: `GET` | `PUT` | `DELETE` (single by ID)
-    * '/students/lastname/<string:last_name>' : Students Endpoint - Methods: `GET` (single by Last Name)
-    * '/students/firstname/<string:first_name>' : Students Endpoint - Methods: `GET` (single by First Name)
+    * '/students/lastname/<string:last_name>' : Students Endpoint - Methods: `GET` (looking for each LASTNAME starting with the string)
+    * '/students/firstname/<string:first_name>' : Students Endpoint - Methods: `GET` (looking for each FIRSTNAME starting with the string)
   * Classes
     * '/classes' : Classes Endpoint - Methods: `GET` (all) | `POST`
     * '/classes/<int:code>' : Classes Endpoint - Methods: `GET` | `PUT` | `DELETE` (single by ID)
-    * '/classes/title/<string:title>' : Classes Endpoint - Methods: `GET` (single by Title)
-    * '/classes/description/<string:description>' : Classes Endpoint - Methods: `GET` (single by Description)
+    * '/classes/title/<string:title>' : Classes Endpoint - Methods: `GET` (looking for each TITLE starting with the string)
+    * '/classes/description/<string:description>' : Classes Endpoint - Methods: `GET` (looking for each DESCRIPTION starting with the string)
   * Grades (Class made to join Students and Classes)
     * '/grades' : Grades Endpoint - Methods: `GET` (all) | `POST`
     * '/grades/classes/<int:code>' : Students of a Class Endpoint - Methods: `GET` (single by Class' Code)
