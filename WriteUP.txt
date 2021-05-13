@@ -1,0 +1,7 @@
+Front End: I believe Angular or REACT would be good choices to make a GUI for the system, with some forms to fill the data.
+Back End:
+ DATABASE: I don't think this system could be different on using either MYSQL or PostgreSQL both would work great. 
+            The API is already using tables so it would be great to continue with a Relational DATABASE
+
+Overall a lot more information is going to be needed for the different tables the system will need. 
+Work on the API needs to be done to further expand this system as well on data structure
