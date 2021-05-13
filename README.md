@@ -42,4 +42,8 @@
     ```
 `PUT` requests needs a body with data that needs to be updated within the same parameters stablished for `POST`
  
+* **Execute**
+
+To execute te API just run the `main.py` and the flask app will execute on: `http://127.0.0.1:5000/`
+
 **For more examples on check the `Postman_API_TESTs` file**
