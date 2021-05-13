@@ -62,7 +62,7 @@ grades_fields = {
 	'class_id': fields.Integer
 }
 
-# Students Classes with Rest Methods
+# Students Classes with REST Methods
 class StudentLastName(Resource):
     @marshal_with(student_fields)
     def get(self,last_name):
@@ -137,7 +137,7 @@ class Students(Resource):
         db.session.commit()
         return student, 201
 
-# Class Classes with Rest Methods
+# Class Classes with REST Methods
 
 class ClasseTitle(Resource):
     @marshal_with(classes_fields)
@@ -214,7 +214,7 @@ class Classes(Resource):
         db.session.commit()
         return classs, 201
     
-#Grades Classes with Rest Methods
+#Grades Classes with REST Methods
 
 class GradesClasses(Resource):
     @marshal_with(student_fields) 
